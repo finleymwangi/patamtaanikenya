@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 
-const TABS = ["overview", "listings", "users", "verifications", "messages", "reports", "payments"];
+const TABS = ["overview", "listings", "users", "verifications", "messages", "reports", "payments", "careers"];
 
 export default function AdminDashboard() {
   const [authenticated, setAuthenticated] = useState(false);
@@ -50,6 +50,13 @@ export default function AdminDashboard() {
   const [expandedMessage, setExpandedMessage] = useState(null);
   const [replyText, setReplyText] = useState("");
   const [sendingReply, setSendingReply] = useState(null);
+
+  const [careers, setCareers] = useState([]);
+  const [loadingCareers, setLoadingCareers] = useState(false);
+  const [showCareerForm, setShowCareerForm] = useState(false);
+  const [editingCareer, setEditingCareer] = useState(null);
+  const [careerForm, setCareerForm] = useState({ title: "", department: "", location: "Nairobi, Kenya", type: "Full-time", description: "", requirements: "" });
+  const [submittingCareer, setSubmittingCareer] = useState(false);
 
   // Profile deep-dive modal
   const [profileModal, setProfileModal] = useState(null);
@@ -195,6 +202,19 @@ export default function AdminDashboard() {
     }
   };
 
+const fetchCareers = async () => {
+    setLoadingCareers(true);
+    try {
+      const res = await fetch("/api/admin/careers");
+      const data = await res.json();
+      if (data.success) setCareers(data.careers);
+    } catch (err) {
+      console.error("Failed to fetch careers:", err);
+    } finally {
+      setLoadingCareers(false);
+    }
+  };
+
   const openProfileModal = async (userId) => {
     setProfileModal(userId);
     setProfileData(null);
@@ -243,6 +263,7 @@ export default function AdminDashboard() {
     if (activeTab === "reports") fetchReports();
     if (activeTab === "payments") fetchPayments();
     if (activeTab === "messages") fetchMessages();
+    if (activeTab === "careers") fetchCareers();
   }, [authenticated, activeTab]);
 
   const handleResolveReport = async (reportId, status) => {
@@ -412,6 +433,60 @@ export default function AdminDashboard() {
       fetchMessages();
     } catch (err) {
       console.error("Failed to mark read:", err);
+    }
+  };
+
+  const handleCareerSubmit = async () => {
+    setSubmittingCareer(true);
+    try {
+      const method = editingCareer ? "PUT" : "POST";
+      const body = editingCareer
+        ? { id: editingCareer.id, ...careerForm }
+        : careerForm;
+
+      const res = await fetch("/api/admin/careers", {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to save.");
+      setShowCareerForm(false);
+      setEditingCareer(null);
+      setCareerForm({ title: "", department: "", location: "Nairobi, Kenya", type: "Full-time", description: "", requirements: "" });
+      fetchCareers();
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setSubmittingCareer(false);
+    }
+  };
+
+  const handleToggleCareer = async (id, currentStatus) => {
+    try {
+      const career = careers.find((c) => c.id === id);
+      await fetch("/api/admin/careers", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...career, id, is_active: !currentStatus }),
+      });
+      fetchCareers();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleDeleteCareer = async (id) => {
+    if (!confirm("Delete this job posting permanently?")) return;
+    try {
+      await fetch("/api/admin/careers", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      fetchCareers();
+    } catch (err) {
+      alert(err.message);
     }
   };
 
@@ -1020,6 +1095,91 @@ export default function AdminDashboard() {
                 </div>
               );
             })}
+          </div>
+        )}
+
+{/* CAREERS */}
+        {activeTab === "careers" && (
+          <div>
+            <div className="flex justify-end mb-4">
+              <button
+                onClick={() => { setShowCareerForm(true); setEditingCareer(null); setCareerForm({ title: "", department: "", location: "Nairobi, Kenya", type: "Full-time", description: "", requirements: "" }); }}
+                className="bg-[#FF6B35] hover:bg-[#E8521A] text-white font-semibold px-5 py-2.5 rounded-xl transition text-sm"
+              >
+                + Post a Job
+              </button>
+            </div>
+
+            {showCareerForm && (
+              <div className="bg-[#111111] border border-[#2a2a2a] rounded-2xl p-6 mb-6 space-y-4">
+                <h3 className="font-bold">{editingCareer ? "Edit Job" : "New Job Posting"}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs text-[#888] mb-1 block">Job Title</label>
+                    <input type="text" value={careerForm.title} onChange={(e) => setCareerForm(p => ({ ...p, title: e.target.value }))} placeholder="e.g. Software Engineer" className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-white px-3 py-2 rounded-lg text-sm focus:outline-none focus:border-[#FF6B35] transition" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-[#888] mb-1 block">Department</label>
+                    <input type="text" value={careerForm.department} onChange={(e) => setCareerForm(p => ({ ...p, department: e.target.value }))} placeholder="e.g. Engineering" className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-white px-3 py-2 rounded-lg text-sm focus:outline-none focus:border-[#FF6B35] transition" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-[#888] mb-1 block">Location</label>
+                    <input type="text" value={careerForm.location} onChange={(e) => setCareerForm(p => ({ ...p, location: e.target.value }))} className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-white px-3 py-2 rounded-lg text-sm focus:outline-none focus:border-[#FF6B35] transition" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-[#888] mb-1 block">Type</label>
+                    <select value={careerForm.type} onChange={(e) => setCareerForm(p => ({ ...p, type: e.target.value }))} className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-white px-3 py-2 rounded-lg text-sm focus:outline-none focus:border-[#FF6B35] transition">
+                      <option>Full-time</option>
+                      <option>Part-time</option>
+                      <option>Contract</option>
+                      <option>Internship</option>
+                      <option>Remote</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs text-[#888] mb-1 block">Description</label>
+                  <textarea value={careerForm.description} onChange={(e) => setCareerForm(p => ({ ...p, description: e.target.value }))} rows={4} placeholder="Describe the role..." className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-white px-3 py-2 rounded-lg text-sm focus:outline-none focus:border-[#FF6B35] transition resize-none" />
+                </div>
+                <div>
+                  <label className="text-xs text-[#888] mb-1 block">Requirements</label>
+                  <textarea value={careerForm.requirements} onChange={(e) => setCareerForm(p => ({ ...p, requirements: e.target.value }))} rows={3} placeholder="List the requirements..." className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-white px-3 py-2 rounded-lg text-sm focus:outline-none focus:border-[#FF6B35] transition resize-none" />
+                </div>
+                <div className="flex gap-3">
+                  <button onClick={() => { setShowCareerForm(false); setEditingCareer(null); }} className="flex-1 bg-[#1a1a1a] border border-[#2a2a2a] text-white py-2 rounded-lg hover:border-[#FF6B35] transition text-sm">Cancel</button>
+                  <button onClick={handleCareerSubmit} disabled={submittingCareer} className="flex-1 bg-[#FF6B35] hover:bg-[#E8521A] disabled:opacity-50 text-white font-semibold py-2 rounded-lg transition text-sm">
+                    {submittingCareer ? "Saving..." : editingCareer ? "Save Changes" : "Post Job"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {loadingCareers ? (
+              <div className="text-center py-12 text-[#888]">Loading...</div>
+            ) : careers.length === 0 ? (
+              <div className="bg-[#111111] border border-[#2a2a2a] rounded-2xl p-8 text-center text-[#888]">No job postings yet. Click "Post a Job" to add one.</div>
+            ) : (
+              <div className="space-y-3">
+                {careers.map((job) => (
+                  <div key={job.id} className="bg-[#111111] border border-[#2a2a2a] rounded-xl p-4 flex items-center justify-between gap-4">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-semibold">{job.title}</p>
+                        <span className={`text-xs px-2 py-0.5 rounded-full border ${job.is_active ? "border-green-500/30 text-green-400" : "border-red-500/30 text-red-400"}`}>
+                          {job.is_active ? "Active" : "Inactive"}
+                        </span>
+                      </div>
+                      <p className="text-sm text-[#888]">{job.department} · {job.location} · {job.type}</p>
+                    </div>
+                    <div className="flex gap-2 shrink-0">
+                      <button onClick={() => { setEditingCareer(job); setCareerForm({ title: job.title, department: job.department || "", location: job.location || "Nairobi, Kenya", type: job.type || "Full-time", description: job.description, requirements: job.requirements || "" }); setShowCareerForm(true); }} className="bg-[#1a1a1a] border border-[#2a2a2a] text-white text-sm px-3 py-1.5 rounded-lg hover:border-[#FF6B35] transition">Edit</button>
+                      <button onClick={() => handleToggleCareer(job.id, job.is_active)} className="bg-[#1a1a1a] border border-[#2a2a2a] text-white text-sm px-3 py-1.5 rounded-lg hover:border-[#FF6B35] transition">{job.is_active ? "Deactivate" : "Activate"}</button>
+                      <button onClick={() => handleDeleteCareer(job.id)} className="bg-[#1a1a1a] border border-red-500/30 text-red-400 text-sm px-3 py-1.5 rounded-lg hover:bg-red-500/10 transition">Delete</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

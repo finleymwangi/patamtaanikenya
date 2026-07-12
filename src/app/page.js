@@ -291,6 +291,7 @@ export default function Home() {
                 <Link href="/about" className="block text-sm text-[#888] hover:text-white transition">About Us</Link>
                 <Link href="/contact" className="block text-sm text-[#888] hover:text-white transition">Contact</Link>
                 <Link href="/faq" className="block text-sm text-[#888] hover:text-white transition">FAQ</Link>
+                <Link href="/careers" className="block text-sm text-[#888] hover:text-white transition">Careers</Link>
                 <Link href="/terms" className="block text-sm text-[#888] hover:text-white transition">Terms</Link>
                 <Link href="/privacy" className="block text-sm text-[#888] hover:text-white transition">Privacy Policy</Link>
               </div>

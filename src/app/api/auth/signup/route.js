@@ -20,12 +20,19 @@ export async function POST(request) {
     // Check if user already exists
     const { data: existingUser } = await supabase
       .from("users")
-      .select("id")
+      .select("id, email_verified")
       .eq("email", email)
       .maybeSingle();
 
     if (existingUser) {
-      return Response.json({ error: "An account with this email already exists." }, { status: 400 });
+      if (existingUser.email_verified) {
+        // Account is fully verified — block re-registration
+        return Response.json({ error: "An account with this email already exists. Please log in instead." }, { status: 400 });
+      } else {
+        // Account exists but was never verified — delete it and let them start fresh
+        await supabase.from("otps").delete().eq("email", email);
+        await supabase.from("users").delete().eq("id", existingUser.id);
+      }
     }
 
     // Check if phone already exists
@@ -39,13 +46,7 @@ export async function POST(request) {
       return Response.json({ error: "An account with this phone number already exists." }, { status: 400 });
     }
 
-    // Clean and validate phone
-const cleanPhone = phone.replace(/[^0-9]/g, "");
-if (cleanPhone.length < 9 || cleanPhone.length > 12) {
-  return Response.json({ error: "Please enter a valid phone number." }, { status: 400 });
-}
-
-    // Hash password with bcrypt
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
     // Create user
@@ -64,18 +65,10 @@ if (cleanPhone.length < 9 || cleanPhone.length > 12) {
     const otp = generateOTP();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-    // Save OTP to database
-    const { error: otpError } = await supabase
-      .from("otps")
-      .insert([{ email, otp, expires_at: expiresAt }]);
+    await supabase.from("otps").insert([{ email, otp, expires_at: expiresAt }]);
 
-    if (otpError) {
-      console.error("OTP insert error:", otpError);
-    }
-
-    // Send OTP email
     const { error: emailError } = await resend.emails.send({
-      from: "PataMtaani <onboarding@resend.dev>",
+      from: "PataMtaani <noreply@patamtaani.co.ke>",
       to: email,
       subject: "Verify your PataMtaani account",
       html: `
@@ -95,11 +88,11 @@ if (cleanPhone.length < 9 || cleanPhone.length > 12) {
     if (emailError) {
       console.error("Email error:", emailError);
     }
-    
+
     return Response.json({ success: true, message: "Account created. Check your email for the verification code." });
 
   } catch (error) {
     console.error("Signup error:", error);
-    return Response.json({ error: error.message || "Something went wrong. Please try again." }, { status: 500 });
+    return Response.json({ error: error.message || "Something went wrong." }, { status: 500 });
   }
 }

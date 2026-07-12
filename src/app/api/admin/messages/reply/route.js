@@ -16,7 +16,7 @@ export async function POST(request) {
     }
 
     const sendResult = await resend.emails.send({
-      from: "PataMtaani <onboarding@resend.dev>",
+      from: "PataMtaani <noreply@patamtaani.co.ke>",
       to: to_email,
       subject: "Re: Your message to PataMtaani",
       html: `

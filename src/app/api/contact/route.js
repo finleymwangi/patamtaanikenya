@@ -18,7 +18,7 @@ export async function POST(request) {
     await supabase.from("contact_messages").insert([{ name, email, subject, message }]);
 
     await resend.emails.send({
-      from: "PataMtaani Contact <onboarding@resend.dev>",
+      from: "PataMtaani <noreply@patamtaani.co.ke>",
       to: "patamtaanikenya@gmail.com",
       subject: "[Contact] " + subject,
       html: `

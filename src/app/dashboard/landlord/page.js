@@ -690,7 +690,7 @@ export default function LandlordDashboard() {
               </div>
               <div>
                 <label className="text-sm text-[#888] mb-1.5 block">Phone Number</label>
-                <input type="tel" name="phone" value={profileForm.phone} onChange={handleProfileChange} className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-white px-4 py-3 rounded-xl focus:outline-none focus:border-[#FF6B35] transition" />
+                <input type="tel" name="phone" value={profileForm.phone} onChange={handleProfileChange} maxLength={12} onKeyPress={(e) => { if (!/[0-9+]/.test(e.key)) e.preventDefault(); }} className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-white px-4 py-3 rounded-xl focus:outline-none focus:border-[#FF6B35] transition" />
               </div>
               <div>
                 <label className="text-sm text-[#888] mb-1.5 block">New Password</label>
