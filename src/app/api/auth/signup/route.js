@@ -39,6 +39,12 @@ export async function POST(request) {
       return Response.json({ error: "An account with this phone number already exists." }, { status: 400 });
     }
 
+    // Clean and validate phone
+const cleanPhone = phone.replace(/[^0-9]/g, "");
+if (cleanPhone.length < 9 || cleanPhone.length > 12) {
+  return Response.json({ error: "Please enter a valid phone number." }, { status: 400 });
+}
+
     // Hash password with bcrypt
     const hashedPassword = await bcrypt.hash(password, 12);
 
@@ -89,7 +95,7 @@ export async function POST(request) {
     if (emailError) {
       console.error("Email error:", emailError);
     }
-
+    
     return Response.json({ success: true, message: "Account created. Check your email for the verification code." });
 
   } catch (error) {

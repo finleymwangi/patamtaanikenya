@@ -40,6 +40,12 @@ export async function PUT(request) {
       }
     }
 
+    // Clean and validate phone
+const cleanPhone = phone.replace(/[^0-9]/g, "");
+if (cleanPhone.length < 9 || cleanPhone.length > 12) {
+  return Response.json({ error: "Please enter a valid phone number." }, { status: 400 });
+}
+
     const updates = { full_name, email, phone };
 
     if (new_password && new_password.trim() !== "") {
