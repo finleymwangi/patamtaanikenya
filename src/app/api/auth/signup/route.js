@@ -17,7 +17,7 @@ export async function POST(request) {
   try {
     const { full_name, email, phone, password, role } = await request.json();
 
-    // Check if user already exists
+    // Check if email already exists
     const { data: existingUser } = await supabase
       .from("users")
       .select("id, email_verified")
@@ -26,10 +26,10 @@ export async function POST(request) {
 
     if (existingUser) {
       if (existingUser.email_verified) {
-        // Account is fully verified — block re-registration
+        // Fully verified — tell them to log in
         return Response.json({ error: "An account with this email already exists. Please log in instead." }, { status: 400 });
       } else {
-        // Account exists but was never verified — delete it and let them start fresh
+        // Exists but never verified — wipe it and start fresh
         await supabase.from("otps").delete().eq("email", email);
         await supabase.from("users").delete().eq("id", existingUser.id);
       }
@@ -61,12 +61,19 @@ export async function POST(request) {
       return Response.json({ error: "Failed to create account. Please try again." }, { status: 500 });
     }
 
-    // Generate OTP
+    // Generate and save OTP
     const otp = generateOTP();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-    await supabase.from("otps").insert([{ email, otp, expires_at: expiresAt }]);
+    const { error: otpError } = await supabase
+      .from("otps")
+      .insert([{ email, otp, expires_at: expiresAt }]);
 
+    if (otpError) {
+      console.error("OTP insert error:", otpError);
+    }
+
+    // Send OTP email
     const { error: emailError } = await resend.emails.send({
       from: "PataMtaani <noreply@patamtaani.co.ke>",
       to: email,
@@ -86,13 +93,13 @@ export async function POST(request) {
     });
 
     if (emailError) {
-      console.error("Email error:", emailError);
+      console.error("Email send error:", emailError);
     }
 
     return Response.json({ success: true, message: "Account created. Check your email for the verification code." });
 
   } catch (error) {
     console.error("Signup error:", error);
-    return Response.json({ error: error.message || "Something went wrong." }, { status: 500 });
+    return Response.json({ error: error.message || "Something went wrong. Please try again." }, { status: 500 });
   }
 }

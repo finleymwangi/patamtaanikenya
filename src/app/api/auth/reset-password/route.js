@@ -8,10 +8,18 @@ const supabase = createClient(
 
 export async function POST(request) {
   try {
-    const { email, otp, password } = await request.json();
+    const { email, otp, new_password } = await request.json();
 
-    // Verify OTP one more time
-    const { data: otpRecord, error } = await supabase
+    if (!email || !otp || !new_password) {
+      return Response.json({ error: "All fields are required." }, { status: 400 });
+    }
+
+    if (new_password.length < 6) {
+      return Response.json({ error: "Password must be at least 6 characters." }, { status: 400 });
+    }
+
+    // Verify OTP one more time before resetting
+    const { data: otpRecord } = await supabase
       .from("otps")
       .select("*")
       .eq("email", email)
@@ -19,32 +27,21 @@ export async function POST(request) {
       .eq("used", false)
       .single();
 
-    if (error || !otpRecord) {
-      return Response.json({ error: "Invalid or expired code." }, { status: 400 });
+    if (!otpRecord || new Date() > new Date(otpRecord.expires_at)) {
+      return Response.json({ error: "Your reset code has expired. Please request a new one." }, { status: 400 });
     }
 
-    if (new Date() > new Date(otpRecord.expires_at)) {
-      return Response.json({ error: "Code has expired. Please request a new one." }, { status: 400 });
-    }
+    const hashedPassword = await bcrypt.hash(new_password, 12);
 
-    // Hash new password
-    const hashedPassword = await bcrypt.hash(password, 12);
-
-    // Update user password
-    await supabase
-      .from("users")
-      .update({ password: hashedPassword })
-      .eq("email", email);
+    await supabase.from("users").update({ password: hashedPassword }).eq("email", email);
 
     // Mark OTP as used
-    await supabase
-      .from("otps")
-      .update({ used: true })
-      .eq("id", otpRecord.id);
+    await supabase.from("otps").update({ used: true }).eq("id", otpRecord.id);
 
     return Response.json({ success: true });
 
   } catch (error) {
-    return Response.json({ error: "Something went wrong." }, { status: 500 });
+    console.error("Reset password error:", error);
+    return Response.json({ error: "Something went wrong. Please try again." }, { status: 500 });
   }
 }
