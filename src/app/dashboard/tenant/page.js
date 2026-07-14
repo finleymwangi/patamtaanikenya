@@ -404,6 +404,8 @@ const fetchTenantNotifications = async (tenantId) => {
                   name="phone"
                   value={profileForm.phone}
                   onChange={handleProfileChange}
+                  maxLength={12}
+                  onKeyPress={(e) => { if (!/[0-9+]/.test(e.key)) e.preventDefault(); }}
                   className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-white px-4 py-3 rounded-xl focus:outline-none focus:border-[#FF6B35] transition"
                 />
               </div>

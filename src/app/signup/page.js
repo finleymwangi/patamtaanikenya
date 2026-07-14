@@ -17,6 +17,11 @@ export default function Signup() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const [otpTimer, setOtpTimer] = useState(60);
+  const [canResend, setCanResend] = useState(false);
+  const [resendMessage, setResendMessage] = useState("");
+  const [resendLoading, setResendLoading] = useState(false);
+
   const handleRoleSelect = (selectedRole) => {
     setRole(selectedRole);
     setStep(selectedRole);
@@ -55,6 +60,29 @@ export default function Signup() {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    setResendLoading(true);
+    setResendMessage("");
+    setError("");
+    try {
+      const res = await fetch("/api/auth/resend-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: formData.email }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to resend.");
+      setResendMessage("✓ New code sent! Check your email.");
+      setOtpTimer(60);
+      setCanResend(false);
+      setOtp("");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -173,6 +201,8 @@ window.location.href = role === "landlord" ? "/dashboard/landlord" : "/dashboard
                   onChange={handleChange}
                   placeholder="0712 345678"
                   required
+                  maxLength={12}
+                  onKeyPress={(e) => { if (!/[0-9+]/.test(e.key)) e.preventDefault(); }}
                   className="w-full bg-[#111111] border border-[#2a2a2a] text-white placeholder-[#888] px-4 py-3 rounded-xl focus:outline-none focus:border-[#FF6B35] transition"
                 />
               </div>
@@ -260,6 +290,28 @@ window.location.href = role === "landlord" ? "/dashboard/landlord" : "/dashboard
                 {loading ? "Verifying..." : "Verify Account"}
               </button>
             </form>
+
+            {resendMessage && (
+              <div className="bg-green-500/10 border border-green-500/20 text-green-400 text-sm px-4 py-3 rounded-xl mt-4">
+                {resendMessage}
+              </div>
+            )}
+
+            <div className="text-center mt-4 text-sm">
+              {canResend ? (
+                <button
+                  onClick={handleResend}
+                  disabled={resendLoading}
+                  className="text-[#FF6B35] hover:underline disabled:opacity-50 font-medium"
+                >
+                  {resendLoading ? "Sending..." : "Didn't receive it? Resend code"}
+                </button>
+              ) : (
+                <p className="text-[#888]">
+                  Resend code in <span className="text-white font-medium">{otpTimer}s</span>
+                </p>
+              )}
+            </div>
           </div>
         )}
 
