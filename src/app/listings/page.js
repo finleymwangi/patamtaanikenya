@@ -73,6 +73,7 @@ export default function Listings() {
               <option value="studio">Studio Apartment</option>
               <option value="bedsitter">Bedsitter</option>
               <option value="single_room">Single Room</option>
+              <option value="double_room">Double Room</option>
               <option value="one_bedroom">One Bedroom</option>
               <option value="two_bedroom">Two Bedroom</option>
               <option value="three_bedroom">Three Bedroom</option>

@@ -94,6 +94,7 @@ function FormFields({ formData, handleChange }) {
           <option value="studio">Studio Apartment</option>
           <option value="bedsitter">Bedsitter</option>
           <option value="single_room">Single Room</option>
+          <option value="double_room">Double Room</option>
           <option value="one_bedroom">One Bedroom</option>
           <option value="two_bedroom">Two Bedroom</option>
           <option value="three_bedroom">Three Bedroom</option>
@@ -794,6 +795,62 @@ export default function LandlordDashboard() {
             </div>
             <div className="space-y-4">
               <FormFields formData={formData} handleChange={handleChange} />
+
+              {/* Edit photos */}
+              <div>
+                <label className="text-sm text-[#888] mb-2 block">Photos</label>
+                {editingListing?.photos?.length > 0 && (
+                  <div className="grid grid-cols-4 gap-2 mb-3">
+                    {(editingListing.photos || []).map((url, i) => (
+                      <div key={i} className="relative">
+                        <img src={url} alt="" className="w-full h-16 object-cover rounded-lg" />
+                        <button
+                          onClick={async () => {
+                            const newPhotos = editingListing.photos.filter((_, idx) => idx !== i);
+                            await fetch("/api/listings/update-photos", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ listing_id: editingListing.id, photos: newPhotos }),
+                            });
+                            setEditingListing((prev) => ({ ...prev, photos: newPhotos }));
+                            fetchListings(user?.id);
+                          }}
+                          className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center"
+                        >✕</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {(editingListing?.photos?.length || 0) < 8 && (
+                  <label className="w-full border-2 border-dashed border-[#2a2a2a] hover:border-[#FF6B35] rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer transition">
+                    <span className="text-xl mb-1">📷</span>
+                    <span className="text-xs text-[#888]">Add more photos ({editingListing?.photos?.length || 0}/8)</span>
+                    <input type="file" accept="image/*" multiple className="hidden" onChange={async (e) => {
+                      const files = Array.from(e.target.files);
+                      const currentCount = editingListing?.photos?.length || 0;
+                      const allowed = files.slice(0, 8 - currentCount);
+                      const urls = [];
+                      for (const file of allowed) {
+                        const fileName = `${editingListing.id}/${Date.now()}-${file.name}`;
+                        const { error } = await supabase.storage.from("listing-images").upload(fileName, file, { cacheControl: "3600", upsert: false });
+                        if (!error) {
+                          const { data: urlData } = supabase.storage.from("listing-images").getPublicUrl(fileName);
+                          urls.push(urlData.publicUrl);
+                        }
+                      }
+                      const newPhotos = [...(editingListing.photos || []), ...urls];
+                      await fetch("/api/listings/update-photos", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ listing_id: editingListing.id, photos: newPhotos }),
+                      });
+                      setEditingListing((prev) => ({ ...prev, photos: newPhotos }));
+                      fetchListings(user?.id);
+                    }} />
+                  </label>
+                )}
+              </div>
+
               {submitError && <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-3 rounded-xl">{submitError}</div>}
               <div className="flex gap-3 pt-2">
                 <button onClick={() => { setShowEditForm(false); setEditingListing(null); }} className="flex-1 bg-[#1a1a1a] border border-[#2a2a2a] text-white py-3 rounded-xl hover:border-[#FF6B35] transition">Cancel</button>

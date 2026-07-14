@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 
-const TABS = ["overview", "listings", "users", "verifications", "messages", "reports", "payments", "careers"];
+const TABS = ["overview", "listings", "users", "verifications", "messages", "reports", "payments", "careers", "reviews"];
 
 export default function AdminDashboard() {
   const [authenticated, setAuthenticated] = useState(false);
@@ -57,6 +57,9 @@ export default function AdminDashboard() {
   const [editingCareer, setEditingCareer] = useState(null);
   const [careerForm, setCareerForm] = useState({ title: "", department: "", location: "Nairobi, Kenya", type: "Full-time", description: "", requirements: "" });
   const [submittingCareer, setSubmittingCareer] = useState(false);
+
+  const [adminReviews, setAdminReviews] = useState([]);
+  const [loadingAdminReviews, setLoadingAdminReviews] = useState(false);
 
   // Profile deep-dive modal
   const [profileModal, setProfileModal] = useState(null);
@@ -215,6 +218,19 @@ const fetchCareers = async () => {
     }
   };
 
+  const fetchAdminReviews = async () => {
+    setLoadingAdminReviews(true);
+    try {
+      const res = await fetch("/api/admin/reviews");
+      const data = await res.json();
+      if (data.success) setAdminReviews(data.reviews);
+    } catch (err) {
+      console.error("Failed to fetch reviews:", err);
+    } finally {
+      setLoadingAdminReviews(false);
+    }
+  };
+
   const openProfileModal = async (userId) => {
     setProfileModal(userId);
     setProfileData(null);
@@ -264,6 +280,7 @@ const fetchCareers = async () => {
     if (activeTab === "payments") fetchPayments();
     if (activeTab === "messages") fetchMessages();
     if (activeTab === "careers") fetchCareers();
+    if (activeTab === "reviews") fetchAdminReviews();
   }, [authenticated, activeTab]);
 
   const handleResolveReport = async (reportId, status) => {
@@ -527,6 +544,61 @@ const fetchCareers = async () => {
               {loading ? "Logging in..." : "Login"}
             </button>
           </form>
+          {/* REVIEWS */}
+        {activeTab === "reviews" && (
+          <div className="space-y-3">
+            {loadingAdminReviews ? (
+              <div className="text-center py-12 text-[#888]">Loading reviews...</div>
+            ) : adminReviews.length === 0 ? (
+              <div className="bg-[#111111] border border-[#2a2a2a] rounded-2xl p-8 text-center text-[#888]">No reviews yet.</div>
+            ) : adminReviews.map((r) => (
+              <div key={r.id} className={"bg-[#111111] border rounded-xl p-4 " + (r.is_approved ? "border-green-500/20" : "border-[#2a2a2a]")}>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="font-semibold">{r.name}</p>
+                      <span className="text-xs text-[#888]">{r.role} · {r.location}</span>
+                      <span className={"text-xs px-2 py-0.5 rounded-full " + (r.is_approved ? "bg-green-500/10 text-green-400 border border-green-500/20" : "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20")}>
+                        {r.is_approved ? "Approved" : "Pending"}
+                      </span>
+                    </div>
+                    <p className="text-sm text-[#888] leading-relaxed">"{r.review}"</p>
+                    <p className="text-xs text-[#888] mt-2">{new Date(r.created_at).toLocaleString()}</p>
+                  </div>
+                  <div className="flex gap-2 shrink-0">
+                    <button
+                      onClick={async () => {
+                        await fetch("/api/admin/reviews", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ id: r.id, is_approved: !r.is_approved }),
+                        });
+                        fetchAdminReviews();
+                      }}
+                      className="bg-[#1a1a1a] border border-[#2a2a2a] text-white text-sm px-3 py-1.5 rounded-lg hover:border-[#FF6B35] transition"
+                    >
+                      {r.is_approved ? "Unapprove" : "Approve"}
+                    </button>
+                    <button
+                      onClick={async () => {
+                        if (!confirm("Delete this review?")) return;
+                        await fetch("/api/admin/reviews", {
+                          method: "DELETE",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ id: r.id }),
+                        });
+                        fetchAdminReviews();
+                      }}
+                      className="bg-[#1a1a1a] border border-red-500/30 text-red-400 text-sm px-3 py-1.5 rounded-lg hover:bg-red-500/10 transition"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
         </div>
       </main>
     );
@@ -805,6 +877,7 @@ const fetchCareers = async () => {
                 <option value="studio">Studio Apartment</option>
                 <option value="bedsitter">Bedsitter</option>
                 <option value="single_room">Single Room</option>
+                <option value="double_room">Double Room</option>
                 <option value="one_bedroom">One Bedroom</option>
                 <option value="two_bedroom">Two Bedroom</option>
                 <option value="three_bedroom">Three Bedroom</option>
@@ -1012,11 +1085,17 @@ const fetchCareers = async () => {
                       <p className="text-sm text-[#f5f0eb] leading-relaxed">{msg.message}</p>
                       <p className="text-xs text-[#888]">Received: {new Date(msg.created_at).toLocaleString()}</p>
                       <div>
-                        <label className="text-sm text-[#888] mb-1.5 block">Reply to {msg.name}</label>
-                        <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} rows={4} placeholder="Write your reply..." className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-white placeholder-[#888] px-4 py-3 rounded-xl focus:outline-none focus:border-[#FF6B35] transition resize-none mb-3" />
-                        <button onClick={() => handleSendReply(msg)} disabled={sendingReply === msg.id} className="bg-[#FF6B35] hover:bg-[#E8521A] disabled:opacity-50 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition">
-                          {sendingReply === msg.id ? "Sending..." : "Send Reply"}
-                        </button>
+                        {msg.admin_reply && (
+                          <div className="bg-[#FF6B35]/10 border border-[#FF6B35]/20 rounded-xl p-4 mb-4">
+                            <p className="text-xs text-[#FF6B35] uppercase tracking-widest mb-2">Your reply — sent {new Date(msg.replied_at).toLocaleString()}</p>
+                            <p className="text-sm text-[#f5f0eb] leading-relaxed whitespace-pre-wrap">{msg.admin_reply}</p>
+                          </div>
+                        )}
+                        <label className="text-sm text-[#888] mb-1.5 block">{msg.admin_reply ? "Send another reply" : "Reply to"} {msg.name}</label>
+                          <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} rows={4} placeholder="Write your reply..." className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-white placeholder-[#888] px-4 py-3 rounded-xl focus:outline-none focus:border-[#FF6B35] transition resize-none mb-3" />
+                          <button onClick={() => handleSendReply(msg)} disabled={sendingReply === msg.id} className="bg-[#FF6B35] hover:bg-[#E8521A] disabled:opacity-50 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition">
+                            {sendingReply === msg.id ? "Sending..." : "Send Reply"}
+                          </button>
                       </div>
                     </div>
                   )}

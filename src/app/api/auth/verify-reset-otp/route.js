@@ -9,25 +9,30 @@ export async function POST(request) {
   try {
     const { email, otp } = await request.json();
 
-    const { data: otpRecord, error } = await supabase
+    if (!email || !otp) {
+      return Response.json({ error: "Email and code are required." }, { status: 400 });
+    }
+
+    const { data: otpRecord } = await supabase
       .from("otps")
       .select("*")
       .eq("email", email)
       .eq("otp", otp)
       .eq("used", false)
-      .single();
+      .maybeSingle();
 
-    if (error || !otpRecord) {
-      return Response.json({ error: "Invalid or expired code." }, { status: 400 });
+    if (!otpRecord) {
+      return Response.json({ error: "Invalid reset code. Please check and try again." }, { status: 400 });
     }
 
     if (new Date() > new Date(otpRecord.expires_at)) {
-      return Response.json({ error: "Code has expired. Please request a new one." }, { status: 400 });
+      return Response.json({ error: "This code has expired. Please request a new one." }, { status: 400 });
     }
 
     return Response.json({ success: true });
 
   } catch (error) {
-    return Response.json({ error: "Something went wrong." }, { status: 500 });
+    console.error("Verify reset OTP error:", error);
+    return Response.json({ error: "Something went wrong. Please try again." }, { status: 500 });
   }
 }

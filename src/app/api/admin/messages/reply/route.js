@@ -15,7 +15,7 @@ export async function POST(request) {
       return Response.json({ error: "Reply text and recipient email are required." }, { status: 400 });
     }
 
-    const sendResult = await resend.emails.send({
+    await resend.emails.send({
       from: "PataMtaani <noreply@patamtaani.co.ke>",
       to: to_email,
       subject: "Re: Your message to PataMtaani",
@@ -32,10 +32,16 @@ export async function POST(request) {
       `,
     });
 
-    console.log("Resend result:", JSON.stringify(sendResult));
-
+    // Save the reply to the message
     if (message_id) {
-      await supabase.from("contact_messages").update({ is_read: true }).eq("id", message_id);
+      await supabase
+        .from("contact_messages")
+        .update({
+          is_read: true,
+          admin_reply: reply_text,
+          replied_at: new Date().toISOString(),
+        })
+        .eq("id", message_id);
     }
 
     return Response.json({ success: true });
