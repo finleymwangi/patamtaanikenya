@@ -3,6 +3,11 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 
+export const metadata = {
+  title: "Careers | PataMtaani",
+  description: "Join the PataMtaani team and help build Kenya's neighborhood rental marketplace.",
+};
+
 export default function Careers() {
   const [careers, setCareers] = useState([]);
   const [loading, setLoading] = useState(true);

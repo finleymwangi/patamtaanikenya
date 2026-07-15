@@ -4,6 +4,11 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 
+export const metadata = {
+  title: "Contact Us | PataMtaani",
+  description: "Get in touch with the PataMtaani team. We're here to help landlords and tenants.",
+};
+
 function ContactForm() {
   const searchParams = useSearchParams();
   const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });

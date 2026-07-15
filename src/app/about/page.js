@@ -1,6 +1,11 @@
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 
+export const metadata = {
+  title: "About Us | PataMtaani",
+  description: "PataMtaani is Kenya's hyperlocal rental marketplace built for everyday Kenyans. Find affordable homes in your neighborhood.",
+};
+
 export default function About() {
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-white">

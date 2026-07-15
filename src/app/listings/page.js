@@ -3,6 +3,11 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 
+export const metadata = {
+  title: "Browse Rentals in Nairobi | PataMtaani",
+  description: "Search affordable bedsitters, single rooms, and apartments for rent across Nairobi neighborhoods. Filter by estate, price, and house type.",
+};
+
 export default function Listings() {
   const [search, setSearch] = useState("");
   const [houseType, setHouseType] = useState("");
