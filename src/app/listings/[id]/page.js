@@ -162,7 +162,7 @@ const handleSubmitReport = async () => {
   const photos = Array.isArray(listing.photos) ? listing.photos : [];
   const houseType = (listing.house_type || "").replace(/_/g, " ");
   const price = (listing.price || 0).toLocaleString();
-  const rawPhone = (listing.contact_phone || listing.users?.phone || "").replace(/[^0-9]/g, "");
+  const rawPhone = (listing.display_phone || "").replace(/[^0-9]/g, "");
   const waPhone = rawPhone.startsWith("0") ? "254" + rawPhone.slice(1) : rawPhone;
   const waText = encodeURIComponent("Hi, I saw your listing on PataMtaani - " + houseType + " in " + listing.location + " for Ksh " + price + "/mo. Is it still available?");
   const waLink = waPhone ? "https://wa.me/" + waPhone + "?text=" + waText : "https://wa.me/?text=" + waText;
@@ -218,6 +218,12 @@ const handleSubmitReport = async () => {
           </div>
         )}
 
+        {listing.contact_phone && (
+                  <span className="text-xs bg-[#FF6B35]/10 text-[#FF6B35] border border-[#FF6B35]/20 px-3 py-1 rounded-full">
+                    📍 Listed by PataMtaani
+                  </span>
+                )}
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="md:col-span-2 space-y-6">
             <div>
@@ -272,7 +278,7 @@ const handleSubmitReport = async () => {
               <div className="bg-[#111111] border border-[#2a2a2a] rounded-2xl p-6 sticky top-24">
                 <h2 className="font-bold mb-4">Contact Landlord</h2>
                 <div className="w-14 h-14 rounded-full bg-[#FF6B35] flex items-center justify-center text-white font-black text-xl mb-3">🏠</div>
-                <p className="font-semibold mb-1">{listing.contact_name || listing.users?.full_name || "Landlord"}</p>
+                <p className="font-semibold mb-1">{listing.display_name}</p>
                 <p className="text-sm text-[#888] mb-6">Member of PataMtaani</p>
                 <div className="space-y-3">
                   {user ? (

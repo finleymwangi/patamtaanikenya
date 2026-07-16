@@ -70,15 +70,19 @@ export async function GET(request) {
       }
     }
 
-// Use contact_phone override if set, otherwise use landlord's phone
-    if (!listing.contact_phone) {
-      listing.contact_phone = listing.users?.phone || null;
-    }
-    if (!listing.contact_name) {
-      listing.contact_name = listing.users?.full_name || "Landlord";
-    }
+    // Resolve display contact — use override if set, fall back to account owner
+    const displayPhone = listing.contact_phone || listing.users?.phone || null;
+    const displayName = listing.contact_name || listing.users?.full_name || "Landlord";
 
-    return Response.json({ success: true, listing, isOwner });
+    return Response.json({
+      success: true,
+      listing: {
+        ...listing,
+        display_phone: displayPhone,
+        display_name: displayName,
+      },
+      isOwner
+    });
 
   } catch (error) {
     return Response.json({ error: "Something went wrong." }, { status: 500 });

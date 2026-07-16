@@ -468,6 +468,10 @@ export default function LandlordDashboard() {
           location: formData.location,
           estate: formData.estate,
           price: formData.price,
+          contact_name: formData.contact_name || null,
+          contact_phone: formData.contact_phone || null,
+          contact_name: formData.contact_name || null,
+          contact_phone: formData.contact_phone || null,
           description: formData.description,
           amenities: {
             water: formData.water,
