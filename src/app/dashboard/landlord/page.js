@@ -116,6 +116,20 @@ function FormFields({ formData, handleChange }) {
         <label className="text-sm text-[#888] mb-1.5 block">Description</label>
         <textarea name="description" value={formData.description} onChange={handleChange} rows={3} placeholder="Describe the house..." className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-white placeholder-[#888] px-4 py-3 rounded-xl focus:outline-none focus:border-[#FF6B35] transition resize-none" />
       </div>
+
+<div className="bg-[#FF6B35]/5 border border-[#FF6B35]/20 rounded-xl p-4 space-y-3">
+        <p className="text-xs text-[#FF6B35] font-semibold uppercase tracking-widest">Contact Override (optional)</p>
+        <p className="text-xs text-[#888]">If you're listing on behalf of a caretaker or agent, enter their contact details below. Tenants will reach them directly on WhatsApp.</p>
+        <div>
+          <label className="text-sm text-[#888] mb-1.5 block">Caretaker / Agent Name</label>
+          <input type="text" name="contact_name" value={formData.contact_name || ""} onChange={handleChange} placeholder="e.g. John Caretaker" className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-white placeholder-[#888] px-4 py-3 rounded-xl focus:outline-none focus:border-[#FF6B35] transition" />
+        </div>
+        <div>
+          <label className="text-sm text-[#888] mb-1.5 block">Caretaker / Agent Phone</label>
+          <input type="tel" name="contact_phone" value={formData.contact_phone || ""} onChange={handleChange} placeholder="e.g. 0712 345678" maxLength={12} onKeyPress={(e) => { if (!/[0-9+]/.test(e.key)) e.preventDefault(); }} className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-white placeholder-[#888] px-4 py-3 rounded-xl focus:outline-none focus:border-[#FF6B35] transition" />
+        </div>
+      </div>
+
       <div>
         <label className="text-sm text-[#888] mb-3 block">Amenities</label>
         <div className="grid grid-cols-2 gap-2">
@@ -158,6 +172,7 @@ export default function LandlordDashboard() {
   const [deletingAccount, setDeletingAccount] = useState(false);
   const [formData, setFormData] = useState({
     title: "", apartment_name: "", house_type: "", location: "", estate: "", price: "", description: "",
+    contact_name: "", contact_phone: "",
     water: false, electricity: false, parking: false, security: false, wifi: false,
   });
 
@@ -365,6 +380,8 @@ export default function LandlordDashboard() {
             parking: formData.parking,
             security: formData.security,
             wifi: formData.wifi,
+            contact_name: formData.contact_name,
+          contact_phone: formData.contact_phone,
           },
         }),
       });
@@ -424,6 +441,8 @@ export default function LandlordDashboard() {
       estate: listing.estate || "",
       price: listing.price || "",
       description: listing.description || "",
+      contact_name: listing.contact_name || "",
+      contact_phone: listing.contact_phone || "",
       water: amenities.water || false,
       electricity: amenities.electricity || false,
       parking: amenities.parking || false,
@@ -456,6 +475,8 @@ export default function LandlordDashboard() {
             parking: formData.parking,
             security: formData.security,
             wifi: formData.wifi,
+            contact_name: formData.contact_name,
+          contact_phone: formData.contact_phone,
           },
         }),
       });

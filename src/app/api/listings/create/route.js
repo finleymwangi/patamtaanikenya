@@ -10,7 +10,7 @@ export async function POST(request) {
     const body = await request.json();
     console.log("Listing body received:", body);
 
-    const { landlord_id, apartment_name, house_type, location, estate, price, description, amenities } = body;
+    const { landlord_id, apartment_name, house_type, location, estate, price, description, amenities, contact_phone, contact_name } = body;
 
     console.log("landlord_id:", landlord_id);
 
@@ -29,6 +29,8 @@ export async function POST(request) {
         price: parseInt(price),
         description,
         amenities,
+        contact_phone: contact_phone || null,
+        contact_name: contact_name || null,
         status: "active",
       }])
       .select()
