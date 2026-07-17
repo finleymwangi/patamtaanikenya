@@ -374,14 +374,14 @@ export default function LandlordDashboard() {
           estate: formData.estate,
           price: formData.price,
           description: formData.description,
+          contact_name: formData.contact_name || null,
+          contact_phone: formData.contact_phone || null,
           amenities: {
             water: formData.water,
             electricity: formData.electricity,
             parking: formData.parking,
             security: formData.security,
             wifi: formData.wifi,
-            contact_name: formData.contact_name,
-          contact_phone: formData.contact_phone,
           },
         }),
       });
@@ -405,7 +405,7 @@ export default function LandlordDashboard() {
         setShowAddForm(false);
         setSubmitSuccess(false);
         setPhotos([]);
-        setFormData({ title: "", apartment_name: "", house_type: "", location: "", estate: "", price: "", description: "", water: false, electricity: false, parking: false, security: false, wifi: false });
+        setFormData({ title: "", apartment_name: "", house_type: "", location: "", estate: "", price: "", description: "", contact_name: "", contact_phone: "", water: false, electricity: false, parking: false, security: false, wifi: false });
       }, 2000);
     } catch (err) {
       setSubmitError(err.message);
