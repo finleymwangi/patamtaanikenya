@@ -21,7 +21,7 @@ export default function About() {
 
           <div className="bg-[#111111] border border-[#2a2a2a] rounded-2xl p-6">
             <h2 className="text-xl font-bold mb-3 text-[#FF6B35]">The Problem</h2>
-            <p className="text-[#f5f0eb] leading-relaxed">Millions of everyday Kenyans are locked out of the online rental market. Websites like BuyRentKenya and Jumia House are dominated by listings for high-end apartments going for Ksh 50,000 and above. The person looking for a decent bedsitter in Umoja or a single room in Githurai for around Ksh 10,000 has no online resource to turn to. They have to physically walk the streets, ask neighbors, or rely on word of mouth.</p>
+            <p className="text-[#f5f0eb] leading-relaxed">Millions of everyday Kenyans are locked out of the online rental market. Websites like BuyRentKenya and Jumia House are dominated by listings for high-end apartments going for Ksh 50,000 and above. The person looking for a decent bedsitter in Umoja or a single room in Githurai in the Ksh 3,000–20,000 range has no online resource to turn to. They have to physically walk the streets, ask neighbors, or rely on word of mouth.</p>
           </div>
 
           <div className="bg-[#111111] border border-[#2a2a2a] rounded-2xl p-6">
@@ -49,7 +49,12 @@ export default function About() {
 
           <div className="bg-[#111111] border border-[#2a2a2a] rounded-2xl p-6">
             <h2 className="text-xl font-bold mb-3 text-[#FF6B35]">Who We Are</h2>
-            <p className="text-[#f5f0eb] leading-relaxed">PataMtaani is a Kenyan startup founded with one goal — to make finding a home in your neighborhood as easy as sending a WhatsApp message. We are a small but passionate team that believes technology should work for every Kenyan, not just those who can afford Westlands rents. We are based in Nairobi and we are building this for our own communities first.</p>
+            <p className="text-[#f5f0eb] leading-relaxed">PataMtaani was founded by Finlay N. Mwangi with one goal — to make finding a home in your neighborhood as easy as sending a WhatsApp message. It's currently a one-person effort, built by someone who believes technology should work for every Kenyan, not just those who can afford Westlands rents, and who is building this for his own community first.</p>
+          </div>
+
+          <div className="bg-[#111111] border border-[#2a2a2a] rounded-2xl p-6">
+            <h2 className="text-xl font-bold mb-3 text-[#FF6B35]">Who It's For</h2>
+            <p className="text-[#f5f0eb] leading-relaxed">If you're a tenant looking for a bedsitter, single room, or one-bedroom in the Ksh 3,000–20,000 range, PataMtaani is built with you in mind. If you're a landlord or caretaker managing rentals in these areas, listing with us is free and takes a few minutes.</p>
           </div>
 
           <div className="bg-[#111111] border border-[#2a2a2a] rounded-2xl p-6">

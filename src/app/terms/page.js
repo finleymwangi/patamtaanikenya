@@ -8,6 +8,7 @@ export default function Terms() {
 
       <div className="max-w-3xl mx-auto px-6 py-16">
         <h1 className="text-4xl font-black mb-2">Terms and Conditions</h1>
+        <p className="text-[#888] mb-2">Operated by Finlay N. Mwangi, individual sole proprietor, based in Kenya.</p>
         <p className="text-[#888] mb-12">Last updated: July 2026</p>
 
         <div className="space-y-8 text-[#f5f0eb]">
@@ -30,11 +31,11 @@ export default function Terms() {
             },
             {
               title: "5. Verification",
-              content: "Landlord verification is currently offered free of charge. PataMtaani reserves the right to reject a verification application if the submitted documents do not meet our standards or if the identity cannot be confirmed. Verification does not constitute an endorsement or guarantee of a landlord's listings or conduct."
+              content: "Submitting your ID for landlord verification is free. Activating your verified badge, once your ID is approved, requires a Ksh 200 monthly fee paid via M-Pesa. PataMtaani reserves the right to reject a verification application if the submitted documents do not meet our standards or if the identity cannot be confirmed. Verification does not constitute an endorsement or guarantee of a landlord's listings or conduct."
             },
             {
               title: "6. Intellectual Property",
-              content: "All content on PataMtaani, including the platform design, logo, branding, and written content, is the property of PataMtaani and is protected under Kenyan intellectual property law. You may not copy, reproduce, distribute, or use any part of the platform for commercial purposes without our written permission. Content you submit to the platform, such as listing photos and descriptions, remains your property, but you grant PataMtaani a non-exclusive licence to display and use that content for platform operations."
+              content: "All content on PataMtaani, including the platform design, logo, branding, and written content, is the property of Finlay N. Mwangi and is protected under Kenyan intellectual property law. You may not copy, reproduce, distribute, or use any part of the platform for commercial purposes without written permission. Content you submit to the platform, such as listing photos and descriptions, remains your property, but you grant PataMtaani a non-exclusive licence to display and use that content for platform operations."
             },
             {
               title: "7. Prohibited Activities",

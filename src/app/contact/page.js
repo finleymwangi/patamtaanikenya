@@ -86,7 +86,9 @@ function ContactForm() {
               <div className="w-10 h-10 bg-[#FF6B35]/10 border border-[#FF6B35]/20 rounded-xl flex items-center justify-center text-[#FF6B35]">📧</div>
               <div>
                 <p className="text-xs text-[#888] mb-0.5">Email</p>
-                <p className="font-medium">patamtaanikenya@gmail.com</p>
+                <a href="mailto:patamtaanikenya@gmail.com" className="font-medium text-[#FF6B35] hover:underline">
+                  Email Us!😊
+                </a>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -99,7 +101,7 @@ function ContactForm() {
                   rel="noopener noreferrer"
                   className="font-medium text-[#FF6B35] hover:underline"
                   >
-                    Talk To Us On WhatsApp! 😊
+                    Talk To Us On WhatsApp!😊
                   </a>
               </div>
             </div>
