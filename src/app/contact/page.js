@@ -96,7 +96,7 @@ function ContactForm() {
               <div>
                 <p className="text-xs text-[#888] mb-0.5">WhatsApp</p>
                 <a
-                  href="https://wa.me/254114146895?text=Hello,%20I%20would%20like%20to%20know%20more%20about%20your%20services."
+                  href="https://wa.me/254711531747?text=Hello,%20I%20would%20like%20to%20know%20more%20about%20your%20services."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-medium text-[#FF6B35] hover:underline"
