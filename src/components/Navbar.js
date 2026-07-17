@@ -94,7 +94,8 @@ export default function Navbar({ active }) {
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="flex flex-col gap-1.5 p-2 rounded-lg hover:bg-[#1a1a1a] transition"
-            aria-label="Menu"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
           >
             <span className={`block w-5 h-0.5 bg-white transition-all duration-300 ${menuOpen ? "rotate-45 translate-y-2" : ""}`}></span>
             <span className={`block w-5 h-0.5 bg-white transition-all duration-300 ${menuOpen ? "opacity-0" : ""}`}></span>
@@ -116,7 +117,7 @@ export default function Navbar({ active }) {
                 <span className="text-white">Pata</span>
                 <span className="text-[#FF6B35]">Mtaani</span>
               </Link>
-              <button onClick={() => setMenuOpen(false)} className="text-[#888] hover:text-white text-2xl">✕</button>
+              <button onClick={() => setMenuOpen(false)} aria-label="Close menu" className="text-[#888] hover:text-white text-2xl">✕</button>
             </div>
 
             {user && (

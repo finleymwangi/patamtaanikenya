@@ -184,6 +184,7 @@ const handleSubmitReport = async () => {
               <button
                 onClick={handleSave}
                 disabled={savingListing}
+                aria-label={saved ? "Remove from saved listings" : "Save this listing"}
                 className="absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center text-xl transition"
               >
                 {saved ? "❤️" : "🤍"}
@@ -195,7 +196,7 @@ const handleSubmitReport = async () => {
             {photos.length > 1 && (
               <div className="flex gap-2 overflow-x-auto pb-2">
                 {photos.map((photo, i) => (
-                  <button key={i} onClick={() => setActivePhoto(i)} className={"shrink-0 w-20 h-16 rounded-xl overflow-hidden border-2 transition " + (activePhoto === i ? "border-[#FF6B35]" : "border-transparent")}>
+                  <button key={i} onClick={() => setActivePhoto(i)} aria-label={`View photo ${i + 1}`} aria-current={activePhoto === i} className={"shrink-0 w-20 h-16 rounded-xl overflow-hidden border-2 transition " + (activePhoto === i ? "border-[#FF6B35]" : "border-transparent")}>
                     <img src={photo} alt="" className="w-full h-full object-cover" />
                   </button>
                 ))}
@@ -257,7 +258,7 @@ const handleSubmitReport = async () => {
                   { key: "security", label: "Security" },
                   { key: "wifi", label: "WiFi" },
                 ].map((item) => (
-                  <div key={item.key} className={"flex items-center gap-2 px-4 py-3 rounded-xl border text-sm " + (amenities[item.key] ? "border-green-500/30 text-green-400 bg-green-500/5" : "border-[#2a2a2a] text-[#444]")}>
+                  <div key={item.key} className={"flex items-center gap-2 px-4 py-3 rounded-xl border text-sm " + (amenities[item.key] ? "border-green-500/30 text-green-400 bg-green-500/5" : "border-[#2a2a2a] text-[#777]")}>
                     {item.label} {amenities[item.key] ? "✓" : "✗"}
                   </div>
                 ))}
@@ -293,6 +294,7 @@ const handleSubmitReport = async () => {
                   <button
                     onClick={handleSave}
                     disabled={savingListing}
+                    aria-label={saved ? "Saved — click to remove" : "Save this listing"}
                     className="w-full bg-[#1a1a1a] border border-[#2a2a2a] hover:border-[#FF6B35] text-white font-semibold py-3 rounded-xl transition text-sm text-center"
                   >
                     {saved ? "❤️ Saved" : "🤍 Save Listing"}
@@ -330,7 +332,7 @@ const handleSubmitReport = async () => {
               <>
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-bold">Report this listing</h2>
-                  <button onClick={() => setShowReportForm(false)} className="text-[#888] hover:text-white text-xl">✕</button>
+                  <button onClick={() => setShowReportForm(false)} aria-label="Close report form" className="text-[#888] hover:text-white text-xl">✕</button>
                 </div>
                 <div className="space-y-4">
                   <div>

@@ -303,6 +303,7 @@ const fetchCareers = async () => {
     if (!confirm("Delete this listing permanently?")) return;
     setDeletingFromReport(reportId);
     try {
+      const reportedBy = reports.find((rep) => rep.id === reportId)?.reported_by;
       const res = await fetch("/api/admin/listings/delete", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
@@ -312,11 +313,11 @@ const fetchCareers = async () => {
       if (!res.ok) throw new Error(data.error || "Failed to delete.");
       await handleResolveReport(reportId, "resolved");
       // Notify the reporter that the listing was removed
-      if (r?.reported_by) {
+      if (reportedBy) {
         await fetch("/api/tenant-notifications/new-listings", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ tenant_id: r.reported_by }),
+          body: JSON.stringify({ tenant_id: reportedBy }),
         });
       }
       fetchReports();
@@ -1288,7 +1289,7 @@ const fetchCareers = async () => {
           <div className="bg-[#111111] border border-[#2a2a2a] rounded-2xl w-full max-w-2xl my-8">
             <div className="flex items-center justify-between p-6 border-b border-[#2a2a2a]">
               <h2 className="text-xl font-bold">User Profile</h2>
-              <button onClick={() => { setProfileModal(null); setProfileData(null); }} className="text-[#888] hover:text-white text-xl">✕</button>
+              <button onClick={() => { setProfileModal(null); setProfileData(null); }} aria-label="Close profile" className="text-[#888] hover:text-white text-xl">✕</button>
             </div>
             {loadingProfile ? (
               <div className="p-8 text-center text-[#888]">Loading profile...</div>
@@ -1429,7 +1430,7 @@ const fetchCareers = async () => {
           <div className="bg-[#111111] border border-[#2a2a2a] rounded-2xl w-full max-w-2xl my-8">
             <div className="flex items-center justify-between p-6 border-b border-[#2a2a2a]">
               <h2 className="text-xl font-bold">Listing Preview</h2>
-              <button onClick={() => setListingPreview(null)} className="text-[#888] hover:text-white text-xl">✕</button>
+              <button onClick={() => setListingPreview(null)} aria-label="Close listing preview" className="text-[#888] hover:text-white text-xl">✕</button>
             </div>
             <div className="p-6 space-y-5">
               {(() => {
@@ -1466,7 +1467,7 @@ const fetchCareers = async () => {
                       <p className="text-sm font-semibold mb-2">Amenities</p>
                       <div className="grid grid-cols-2 gap-2">
                         {["water", "electricity", "parking", "security", "wifi"].map((a) => (
-                          <div key={a} className={"flex items-center gap-2 px-3 py-2 rounded-lg border text-sm capitalize " + (amenities[a] ? "border-green-500/30 text-green-400" : "border-[#2a2a2a] text-[#444]")}>
+                          <div key={a} className={"flex items-center gap-2 px-3 py-2 rounded-lg border text-sm capitalize " + (amenities[a] ? "border-green-500/30 text-green-400" : "border-[#2a2a2a] text-[#777]")}>
                             {a} {amenities[a] ? "✓" : "✗"}
                           </div>
                         ))}

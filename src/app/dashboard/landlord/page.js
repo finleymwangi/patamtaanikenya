@@ -777,7 +777,7 @@ export default function LandlordDashboard() {
           <div className="bg-[#111111] border border-[#2a2a2a] rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold">Add New Listing</h2>
-              <button onClick={() => { setShowAddForm(false); setPhotos([]); }} className="text-[#888] hover:text-white text-xl">✕</button>
+              <button onClick={() => { setShowAddForm(false); setPhotos([]); }} aria-label="Close add listing form" className="text-[#888] hover:text-white text-xl">✕</button>
             </div>
             <div className="space-y-4">
               <FormFields formData={formData} handleChange={handleChange} />
@@ -793,7 +793,7 @@ export default function LandlordDashboard() {
                     {photos.map((photo, i) => (
                       <div key={i} className="relative">
                         <img src={URL.createObjectURL(photo)} alt="" className="w-full h-16 object-cover rounded-lg" />
-                        <button onClick={() => removePhoto(i)} className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">✕</button>
+                        <button onClick={() => removePhoto(i)} aria-label={`Remove photo ${i + 1}`} className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">✕</button>
                       </div>
                     ))}
                   </div>
@@ -816,7 +816,7 @@ export default function LandlordDashboard() {
           <div className="bg-[#111111] border border-[#2a2a2a] rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold">Edit Listing</h2>
-              <button onClick={() => { setShowEditForm(false); setEditingListing(null); }} className="text-[#888] hover:text-white text-xl">✕</button>
+              <button onClick={() => { setShowEditForm(false); setEditingListing(null); }} aria-label="Close edit listing form" className="text-[#888] hover:text-white text-xl">✕</button>
             </div>
             <div className="space-y-4">
               <FormFields formData={formData} handleChange={handleChange} />
@@ -841,7 +841,7 @@ export default function LandlordDashboard() {
                             fetchListings(user?.id);
                           }}
                           className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center"
-                        >✕</button>
+                        aria-label={`Remove photo ${i + 1}`}>✕</button>
                       </div>
                     ))}
                   </div>
@@ -893,7 +893,7 @@ export default function LandlordDashboard() {
           <div className="bg-[#111111] border border-[#2a2a2a] rounded-2xl w-full max-w-md p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold">Submit Your ID</h2>
-              <button onClick={() => setShowVerifyForm(false)} className="text-[#888] hover:text-white text-xl">✕</button>
+              <button onClick={() => setShowVerifyForm(false)} aria-label="Close ID verification form" className="text-[#888] hover:text-white text-xl">✕</button>
             </div>
             <p className="text-sm text-[#888] mb-4">Upload a clear photo of your National ID or Passport. The name on your account ({user.full_name}) must match the name on your ID. This is required before you can post listings.</p>
             <label className="w-full border-2 border-dashed border-[#2a2a2a] hover:border-[#FF6B35] rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer transition mb-3">
